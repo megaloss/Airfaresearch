@@ -24,7 +24,7 @@ class TransaviaHandle:
 
             conn.close()
         except Exception as e:
-            print('Error: ', e)
+            print('Transavia retrieving data Error: ', e)
             return False
         airport_dict = {}
         for airport in airports:

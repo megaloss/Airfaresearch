@@ -1,16 +1,23 @@
+import wizzair
 from ryanair import RyanairHandle
 from transavia import TransaviaHandle
+from wizzair import WizzairHandle
 from datetime import datetime, timedelta, date
 import pickle
 from classes import Airport, Route, SingleFare, ReturnFare
 
+airports = {}
+
 
 def refresh_airports_dict():
-    my_handle = RyanairHandle()
-    airports = my_handle.read_airports()
-    my_handle = TransaviaHandle()
-    airports.update(my_handle.read_airports())
-    pickle.dump(airports, open('airports.p','wb'))
+    handles = [RyanairHandle(), TransaviaHandle(), WizzairHandle()]
+    for handle in handles:
+        data = handle.read_airports()
+        if data:
+            airports.update(data)
+        else:
+            print('Failed fo obtain data from ', handle)
+    pickle.dump(airports, open('airports_test.p','wb'))
 
 
 my_handle = RyanairHandle()
@@ -18,6 +25,7 @@ airports = pickle.load(open('airports.p', 'rb'))
 
 # create return flight from a list of 2 separate flights
 my_flights = []
+
 my_flights.append({'route': Route(airports['BRU'], airports['LCA']),
                    'date': datetime(2021, 10, 15, 12, 00)})
 my_flights.append({'route': Route(airports['LCA'], airports['BRU']),

@@ -8,10 +8,9 @@ class RyanairHandle:
     @staticmethod
     def read_airports():
         airports_link = 'https://www.ryanair.com/api/booking/v4/en-gb/res/stations'
-
         response = requests.get(airports_link)
         airports = response.json()
-        airport_dict = {}
+        airport_dict = dict()
         for airport in airports:
             lat = int(airports[airport]['latitude'][:-1]) / 10000 if (
                     airports[airport]['latitude'][-1:] == 'N') else -int(airports[airport]['latitude'][:-1]) / 10000
