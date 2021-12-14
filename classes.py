@@ -1,4 +1,11 @@
 class Airport:
+    airports={}
+
+    @staticmethod
+    def get_airport(airport):
+        return Airport.airports[airport]
+
+
     def __init__(self, id_code, name, city, country, location):
         self.id = id_code
         self.name = name
@@ -7,13 +14,14 @@ class Airport:
         self.location = dict()
         self.location['latitude'] = location[0]
         self.location['longitude'] = location[1]
+        Airport.airports[id_code] = self
 
     def __repr__(self):
         return f" is an airport called {self.name} in the city of {self.city} in {self.country}. Its coordinates are :{self.location}\n"
 
 
 class Route:
-    def __init__(self, from_airport , to_airport):
+    def __init__(self, from_airport: Airport , to_airport: Airport):
         self.from_airport = from_airport
         self.to_airport = to_airport
 

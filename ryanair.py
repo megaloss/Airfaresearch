@@ -21,14 +21,14 @@ class RyanairHandle:
         return airport_dict
 
     @staticmethod
-    def get_fare(route, date):
+    def get_fare(route, date,price_limit=1000):
         SINGLE_TRIP_API_URL = 'https://services-api.ryanair.com/farfnd/3/oneWayFares'
         date = date.strftime('%Y-%m-%d')
         language = 'en'
         limit = 16
         market = 'en-gb'
         offset = 0
-        priceValueTo = 1000
+        priceValueTo = limit
         fares = []
 
         payload = {'departureAirportIataCode': route.from_airport.id,
@@ -61,7 +61,7 @@ class RyanairHandle:
 
 
     @staticmethod
-    def get_return(route, date_outbound, date_inbound):
+    def get_return(route, date_outbound, date_inbound, limit=1000):
         ROUND_TRIP_API_URL = 'https://www.ryanair.com/api/farfnd/v4/roundTripFares'
         date_outbound = date_outbound.strftime('%Y-%m-%d')
         date_inbound = date_inbound.strftime('%Y-%m-%d')
@@ -69,7 +69,7 @@ class RyanairHandle:
         limit = 16
         market = 'en-gb'
         offset = 0
-        price_max = 1000
+        price_max = limit
         fares = []
         payload = {'departureAirportIataCode': route.from_airport.id,
                    'arrivalAirportIataCode': route.to_airport.id,
@@ -101,6 +101,7 @@ class RyanairHandle:
                 flight_number = item['inbound']['flightNumber']
                 inbound = SingleFare(route.invert(), departure_date, arrival_date, price, flight_number)
                 fares.append(ReturnFare(outbound,inbound))
+
         else:
             return False
         return fares
