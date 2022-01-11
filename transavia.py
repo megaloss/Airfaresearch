@@ -3,6 +3,7 @@ from utils import encode_datetime
 import http.client, urllib.request, urllib.parse, urllib.error, json , os
 
 MY_KEY = os.getenv('TRANSAVIA_KEY')
+print ('The key is', MY_KEY)
 
 class TransaviaHandle:
     @staticmethod
@@ -41,10 +42,16 @@ class TransaviaHandle:
             'apikey': MY_KEY,
         }
 
+        if isinstance(date, tuple):
+            originDepartureDate = TransaviaHandle.convert_date(date[0]) + '-' + \
+                                  TransaviaHandle.convert_date(date[1])
+        else:
+            originDepartureDate = TransaviaHandle.convert_date(date)
+
         params = urllib.parse.urlencode({
             'origin':  route.from_airport.id,
             'destination': route.to_airport.id,
-            'originDepartureDate': TransaviaHandle.convert_date(date),
+            'originDepartureDate': originDepartureDate,
             'limit': limit,
 
         })
@@ -76,27 +83,45 @@ class TransaviaHandle:
         headers = {
             'apikey': MY_KEY,
         }
-
+        if isinstance(date_outbound,  tuple):
+            originDepartureDate = TransaviaHandle.convert_date(date_outbound[0])+'-'+ \
+                                  TransaviaHandle.convert_date(date_outbound[1])
+        else:
+            originDepartureDate = TransaviaHandle.convert_date(date_outbound)
+        if isinstance(date_inbound,tuple):
+            destinationDepartureDate = TransaviaHandle.convert_date(date_inbound[0]) + '-' + \
+                                  TransaviaHandle.convert_date(date_inbound[1])
+        else:
+            destinationDepartureDate = TransaviaHandle.convert_date(date_inbound)
+        
+        
+            
         params = urllib.parse.urlencode({
             'origin': route.from_airport.id,
             'destination': route.to_airport.id,
-            'originDepartureDate': TransaviaHandle.convert_date(date_outbound),
-            'destinationDepartureDate': TransaviaHandle.convert_date(date_inbound),
+            'originDepartureDate': originDepartureDate,
+            'destinationDepartureDate': destinationDepartureDate,
             'lowestPricePerDestination': 'T',
             'limit': limit,
 
         })
+
+
 
         try:
             conn = http.client.HTTPSConnection('api.transavia.com')
             conn.request("GET", "/v1/flightoffers/?%s" % params, "{body}", headers)
             response = conn.getresponse()
             data = response.read()
-            data = json.loads(data)
             conn.close()
+            if data:
+                data = json.loads(data)
+            else:
+                return False
+            
         except Exception as e:
-            print("[ERROR: {0}]".format(e))
-            return False
+           print("[ERROR: {0}]".format(e))
+           return False
 
         if not data or not data.get('resultSet'):
             return False

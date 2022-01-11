@@ -20,8 +20,8 @@ def refresh_airports_dict():
     pickle.dump(airports, open('airports_test.p','wb'))
 
 
-#my_handle = RyanairHandle()
-my_handle = TransaviaHandle()
+my_handle = RyanairHandle()
+#my_handle = TransaviaHandle()
 airports = pickle.load(open('airports.p', 'rb'))
 '''
 # create return flight from a list of 2 separate flights
@@ -53,6 +53,9 @@ for trip in new_trip:
     print(trip)
 
 '''
+
+
+'''
 destinations = [airports['EIN'], airports['AMS']]
 
 date_from = (datetime(2021, 12, 15),datetime(2021, 12, 20))
@@ -67,3 +70,23 @@ if fares:
         print (fare)
 else:
     print ('nothing found !')
+'''
+airports = my_handle.read_airports()
+origin = airports['EIN']
+date_from = (datetime(2022, 2, 25),datetime(2022, 2, 28))
+date_to = (datetime(2022, 3, 6),datetime(2022, 3, 8))
+flights=[]
+
+# destinations = my_handle.get_destinations(origin, date_from)
+# for airport in destinations:   
+#     if airports[airport] == origin:
+#         continue
+    
+
+#     my_route = Route(origin, airports[airport])
+
+#     flight = my_handle.get_return(my_route, date_from, date_to)
+#     if flight:
+#         flights.append(flight)
+flights = my_handle.get_cheapest_return(origin, date_from, date_to, airports)
+print (flights[0].outbound.flight_number)
