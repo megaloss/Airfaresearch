@@ -17,7 +17,7 @@ def refresh_airports_dict():
             airports.update(data)
         else:
             print('Failed fo obtain data from ', handle)
-    pickle.dump(airports, open('airports_test.p','wb'))
+    pickle.dump(airports, open('airports.p','wb'))
 
 #refresh_airports_dict()
 #exit(0)

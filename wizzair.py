@@ -5,8 +5,23 @@ from datetime import timedelta
 
 AIRPORTS_URL = 'https://be.wizzair.com/11.17.0/Api/asset/map'
 TIMETABLE_URL = 'https://be.wizzair.com/11.17.0/Api/search/timetable'
-
-
+#TIMETABLE_URL = 'https://be.wizzair.com/11.17.0/Api/assets/timechart'
+headers={"accept": "application/json, text/plain, */*",
+"accept-encoding": "gzip, deflate, br",
+"accept-language": "en-GB,en;q=0.9,ru-RU;q=0.8,ru;q=0.7,en-US;q=0.6,nl;q=0.5",
+"cache-control": "no-cache",
+"content-length": "260",
+"content-type": "application/json;charset=UTF-8",
+"dnt": "1",
+"origin": "https://wizzair.com",
+"pragma": "no-cache",
+"sec-ch-ua-mobile": "?0",
+"sec-ch-ua-platform": "Linux",
+"sec-fetch-dest": "empty",
+"sec-fetch-mode": "cors",
+"sec-fetch-site": "same-site",
+"user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.93 Safari/537.36",
+}
 class WizzairHandle:
 
     @staticmethod
@@ -102,14 +117,13 @@ class WizzairHandle:
                     "adultCount":1,
                     "childCount":0,
                     "infantCount":0,
-                    "currencyCode": "GBP",
                     }
         
 
         #print ("payload = ", payload)
 
-        response = requests.post(TIMETABLE_URL, json=payload)
-        #print (response.url)
+        response = requests.post(TIMETABLE_URL, json=payload, headers=headers)
+        #print (response.text)
         data = response.json()
         #print (data)
         if len (data['outboundFlights'])<1 or len (data["returnFlights"])<1:
