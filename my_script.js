@@ -7,6 +7,14 @@ var greenIcon = new L.Icon({
     popupAnchor: [1, -34],
     shadowSize: [41, 41]
   });
+  var violetIcon = new L.Icon({
+    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-violet.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+  });
   var yellowIcon = new L.Icon({
     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-gold.png',
     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
@@ -81,6 +89,11 @@ function onMapClick(e) {
                     company = 'Ryanair';
                     my_icon = yellowIcon;
                 }
+                else if(flight_no.startsWith('WZ')){
+                    company = 'Wizzair';
+                    my_icon = violetIcon;
+                }
+                
                 else{
                     company = 'Transavia';
                     my_icon = greenIcon;

@@ -19,9 +19,11 @@ def refresh_airports_dict():
             print('Failed fo obtain data from ', handle)
     pickle.dump(airports, open('airports_test.p','wb'))
 
-
-my_handle = RyanairHandle()
+#refresh_airports_dict()
+#exit(0)
+#my_handle = RyanairHandle()
 #my_handle = TransaviaHandle()
+my_handle = WizzairHandle()
 airports = pickle.load(open('airports.p', 'rb'))
 '''
 # create return flight from a list of 2 separate flights
@@ -71,10 +73,12 @@ if fares:
 else:
     print ('nothing found !')
 '''
-airports = my_handle.read_airports()
+#airports = my_handle.read_airports()
 origin = airports['EIN']
-date_from = (datetime(2022, 2, 25),datetime(2022, 2, 28))
-date_to = (datetime(2022, 3, 6),datetime(2022, 3, 8))
+destination = airports['BUD']
+my_route = Route (origin, destination)
+date_from = (datetime(2022, 1, 23),datetime(2022, 1, 31))
+date_to = (datetime(2022, 1, 25),datetime(2022, 2, 11))
 flights=[]
 
 # destinations = my_handle.get_destinations(origin, date_from)
@@ -88,5 +92,19 @@ flights=[]
 #     flight = my_handle.get_return(my_route, date_from, date_to)
 #     if flight:
 #         flights.append(flight)
-flights = my_handle.get_cheapest_return(origin, date_from, date_to, airports)
-print (flights[0].outbound.flight_number)
+#flights = my_handle.get_cheapest_return(origin, date_from, date_to, airports)
+#print (flights[0].outbound.flight_number)
+#response = my_handle.get_return(my_route, date_from, date_to)
+#print (response)
+destinations = (my_handle.get_destinations(origin, date_from))
+count=0
+for dest in destinations:
+    destination = airports.get(dest)
+    if destination:
+        my_route=Route (origin,destination)
+        fare = my_handle.get_return(my_route, date_from, date_to)
+        if fare:
+            print (fare)
+            count+=1
+
+print ("total fares found:", count)

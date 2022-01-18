@@ -73,7 +73,7 @@ class ReturnFare:
 
     def __repr__(self):
         return f'Flight from {self.outbound.route.from_airport.name} to {self.outbound.route.to_airport.name} on {self.outbound.departure_date}\n' \
-               f'Return on {self.inbound.departure_date}. Total price is {self.price:.2f}. Total distance {self.distance()} km. That is {self.price/self.distance()} EUR/km \n'\
+               f'Return on {self.inbound.departure_date}. Total price is {self.price:.2f}. Total distance {self.distance()} km. That is {self.price/self.distance():.2f} EUR/km \n'\
                f'You stay at your destination for {self.stay_period()}'
 
     def distance(self):

@@ -35,7 +35,7 @@ app.add_middleware(
 )
 
 airports= pickle.load(open('airports.p', 'rb'))
-my_handles = [TransaviaHandle(),RyanairHandle()]
+my_handles = [TransaviaHandle(),RyanairHandle(),WizzairHandle()]
 origin = [airports['RTM'], airports['EIN'], airports['AMS'], airports['CRL'], airports['BRU']]
 date_from = (datetime(2022, 2, 25),datetime(2022, 2, 28))
 date_to = (datetime(2022, 3, 6),datetime(2022, 3, 8))

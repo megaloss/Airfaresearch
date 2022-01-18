@@ -3,7 +3,7 @@ from utils import encode_datetime
 import http.client, urllib.request, urllib.parse, urllib.error, json , os
 
 MY_KEY = os.getenv('TRANSAVIA_KEY')
-print ('The key is', MY_KEY)
+print ('The Transavia key is', MY_KEY)
 
 class TransaviaHandle:
     @staticmethod
