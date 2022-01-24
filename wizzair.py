@@ -3,8 +3,8 @@ import requests
 from utils import encode_datetime
 from datetime import timedelta
 
-AIRPORTS_URL = 'https://be.wizzair.com/11.17.0/Api/asset/map'
-TIMETABLE_URL = 'https://be.wizzair.com/11.17.0/Api/search/timetable'
+AIRPORTS_URL = 'https://be.wizzair.com/11.17.2/Api/asset/map'
+TIMETABLE_URL = 'https://be.wizzair.com/11.17.2/Api/search/timetable'
 #TIMETABLE_URL = 'https://be.wizzair.com/11.17.0/Api/assets/timechart'
 headers={"accept": "application/json, text/plain, */*",
 "accept-encoding": "gzip, deflate, br",
