@@ -1,6 +1,17 @@
 from classes import Airport, SingleFare, ReturnFare, Route
 import requests
 from utils import encode_datetime
+# import logging
+
+# # Set up logging
+
+# my_logger=logging.getLogger(__name__)
+# my_logger.setLevel(logging.DEBUG)
+# file_handler = logging.FileHandler('ryanair.log')
+# log_formatter = logging.Formatter('%(asctime)s:%(levelname)s:%(module)s:%(funcName)s:%(message)s')
+
+# file_handler.setFormatter(log_formatter)
+# my_logger.addHandler(file_handler)
 
 
 class RyanairHandle:
@@ -44,8 +55,8 @@ class RyanairHandle:
                    'outboundDepartureDateTo': outboundDepartureDateTo,
                    'priceValueTo': priceValueTo}
         response = requests.get(SINGLE_TRIP_API_URL, params=payload)
-        #print (response.url)
-        #print (response.status_code)
+        #my_logger.debug (response.url)
+        #my_logger.debug (response.status_code)
         data = response.json()
 
         if data['total'] == 1:
@@ -84,12 +95,13 @@ class RyanairHandle:
                    'adultPaxCount': 1,
                    'outboundDepartureDateFrom': outboundDepartureDateFrom,
                    'outboundDepartureDateTo': outboundDepartureDateTo,
-                   'priceValueTo': priceValueTo}
+                   'priceValueTo': priceValueTo,}
         response = requests.get(SINGLE_TRIP_API_URL, params=payload)
-        print (response.url)
-        #print (response.status_code)
+        
+        # my_logger.debug (response.url) -- somehow it does not work !
+        # my_logger.debug ('response code =' + str(response.status_code))
         data = response.json()
-        #print (data)
+        #my_logger.debug (data)
 
         if data['size'] >= 1:
 
@@ -131,12 +143,12 @@ class RyanairHandle:
                    'outboundDepartureDateFrom': outboundDepartureDateFrom,
                    'outboundDepartureDateTo': outboundDepartureDateTo,
                    'priceValueTo': price_max}
-        #print (payload)
+        #my_logger.debug (payload)
 
         response = requests.get(ROUND_TRIP_API_URL, params=payload)
-        #print (response.url)
+        #my_logger.debug (response.url)
         data = response.json()
-        #print (data)
+        #my_logger.debug (data)
 
         if len(data) >= 1:
 
@@ -159,12 +171,16 @@ class RyanairHandle:
 
     @staticmethod
     def get_cheapest_return(origin, date_outbound, date_inbound, airports, limit=1000):
+        # print ('returning empty array !')
+        # return []
 
         flights=[]
+        
         destinations = RyanairHandle.get_destinations(origin, date_outbound)
         if not destinations:
-            return False
-        print ('destinations available from ryanair are:', destinations)
+            return []
+        print(destinations)
+        
         for airport in destinations:   
             if airports[airport] == origin:
                 continue
@@ -173,7 +189,7 @@ class RyanairHandle:
             flight = RyanairHandle.get_return(my_route, date_outbound, date_inbound)
             if flight:
                 flights.extend(flight)
-        #print (flights)
+        #my_logger.debug (flights)
 
         
         return flights

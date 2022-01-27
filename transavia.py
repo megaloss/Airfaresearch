@@ -1,9 +1,22 @@
 from classes import Airport, SingleFare, ReturnFare, Route
 from utils import encode_datetime
 import http.client, urllib.request, urllib.parse, urllib.error, json , os
+import logging
+
+# Set up logging
+
+logger=logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+hdlr = logging.FileHandler('transavia.log')
+fmt = logging.Formatter('%(asctime)s:%(levelname)s:%(module)s:%(funcName)s:%(message)s')
+
+hdlr.setFormatter(fmt)
+logger.addHandler(hdlr)
 
 MY_KEY = os.getenv('TRANSAVIA_KEY')
-print ('The Transavia key is', MY_KEY)
+if not MY_KEY:
+    logger.error('No API key found !')
+logger.info('The Transavia key is ' + MY_KEY)
 
 class TransaviaHandle:
     @staticmethod
@@ -30,7 +43,7 @@ class TransaviaHandle:
             conn.close()
         except Exception as e:
             print('Transavia retrieving data Error: ', e)
-            return False
+            return []
         airport_dict = {}
         for airport in airports:
             airport_dict[airport['id']] = Airport(airport['id'],airport['name'], airport['city'], airport['country']['code'], [airport['geoCoordinates']['latitude'], airport['geoCoordinates']['longitude']])
@@ -65,10 +78,10 @@ class TransaviaHandle:
             data = json.loads(data)
             conn.close()
         except Exception as e:
-            print("[ERROR: {0}]".format(e))
-            return False
+            logger.error("[ERROR: {0}]".format(e))
+            return []
         if not data or not data.get('resultSet'):
-            return False
+            return []
         fares=[]
         for item in data['flightOffer']:
             departure_date = encode_datetime(item['outboundFlight']['departureDateTime'])
@@ -117,14 +130,14 @@ class TransaviaHandle:
             if data:
                 data = json.loads(data)
             else:
-                return False
+                return []
             
         except Exception as e:
-           print("[ERROR: {0}]".format(e))
-           return False
+           logger.error("[ERROR: {0}]".format(e))
+           return []
 
         if not data or not data.get('resultSet'):
-            return False
+            return []
         fares = []
         for item in data['flightOffer']:
             departure_date = encode_datetime(item['outboundFlight']['departureDateTime'])
@@ -175,10 +188,10 @@ class TransaviaHandle:
             data = json.loads(data)
             conn.close()
         except Exception as e:
-            print("[ERROR: {0}]".format(e))
-            return False
+            logger.error("[ERROR: {0}]".format(e))
+            return []
         if not data or not data.get('resultSet'):
-            return False
+            return []
         fares = []
         for item in data['flightOffer']:
             departure_date = encode_datetime(item['outboundFlight']['departureDateTime'])
@@ -228,14 +241,16 @@ class TransaviaHandle:
             conn.request("GET", "/v1/flightoffers/?%s" % params, "{body}", headers)
             response = conn.getresponse()
             data = response.read()
+            if not data:
+                return []
             data = json.loads(data)
             conn.close()
         except Exception as e:
-            print("[ERROR: {0}]".format(e))
-            return False
+            logger.error("[ERROR: {0}]".format(e))
+            return []
 
         if not data or not data.get('resultSet'):
-            return False
+            return []
         fares = []
         for item in data['flightOffer']:
             departure_date = encode_datetime(item['outboundFlight']['departureDateTime'])
