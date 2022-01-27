@@ -45,7 +45,7 @@ headers={
 "sec-fetch-site": "same-site",
 "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.93 Safari/537.36"
 }
-class WizzairHandle:
+class WizzairHandler:
 
     @staticmethod
     def read_airports():
@@ -175,7 +175,7 @@ class WizzairHandle:
                 inbounds.append([departure_date,price])
 
 
-        best_outbound, best_inbound = WizzairHandle.get_best_pair(outbounds, inbounds)
+        best_outbound, best_inbound = WizzairHandler.get_best_pair(outbounds, inbounds)
         flight_number='WZ000'
         if best_outbound and best_inbound:
             outbound = SingleFare(route, best_outbound[0], best_outbound[0], best_outbound[1], flight_number)
@@ -266,7 +266,7 @@ class WizzairHandle:
                     inbounds.append([departure_date,price])
 
 
-                best_outbound, best_inbound = WizzairHandle.get_best_pair(outbounds, inbounds)
+                best_outbound, best_inbound = WizzairHandler.get_best_pair(outbounds, inbounds)
                 flight_number='WZ000'
             if best_outbound and best_inbound:
                 route=Route (origin,destination)
@@ -284,7 +284,7 @@ class WizzairHandle:
 
 
         flights=[]
-        destinations = WizzairHandle.get_destinations(origin, date_outbound)
+        destinations = WizzairHandler.get_destinations(origin, date_outbound)
         if not destinations:
             logger.debug('No destinations available')
             return []
@@ -299,7 +299,7 @@ class WizzairHandle:
                 continue
             dest_airports.append(destination_airport)
 
-        flights = await WizzairHandle.get_returns(origin, dest_airports, date_outbound, date_inbound, airports)
+        flights = await WizzairHandler.get_returns(origin, dest_airports, date_outbound, date_inbound, airports)
         logger.debug (flights)
 
         if not flights:

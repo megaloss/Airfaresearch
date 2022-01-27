@@ -16,9 +16,9 @@ logger.addHandler(hdlr)
 MY_KEY = os.getenv('TRANSAVIA_KEY')
 if not MY_KEY:
     logger.error('No API key found !')
-logger.info('The Transavia key is ' + MY_KEY)
+# logger.info('The Transavia key is ' + MY_KEY)
 
-class TransaviaHandle:
+class TransaviaHandler:
     @staticmethod
     def convert_date(date):
         return date.strftime('%Y%m%d')
@@ -56,10 +56,10 @@ class TransaviaHandle:
         }
 
         if isinstance(date, tuple):
-            originDepartureDate = TransaviaHandle.convert_date(date[0]) + '-' + \
-                                  TransaviaHandle.convert_date(date[1])
+            originDepartureDate = TransaviaHandler.convert_date(date[0]) + '-' + \
+                                  TransaviaHandler.convert_date(date[1])
         else:
-            originDepartureDate = TransaviaHandle.convert_date(date)
+            originDepartureDate = TransaviaHandler.convert_date(date)
 
         params = urllib.parse.urlencode({
             'origin':  route.from_airport.id,
@@ -97,15 +97,15 @@ class TransaviaHandle:
             'apikey': MY_KEY,
         }
         if isinstance(date_outbound,  tuple):
-            originDepartureDate = TransaviaHandle.convert_date(date_outbound[0])+'-'+ \
-                                  TransaviaHandle.convert_date(date_outbound[1])
+            originDepartureDate = TransaviaHandler.convert_date(date_outbound[0])+'-'+ \
+                                  TransaviaHandler.convert_date(date_outbound[1])
         else:
-            originDepartureDate = TransaviaHandle.convert_date(date_outbound)
+            originDepartureDate = TransaviaHandler.convert_date(date_outbound)
         if isinstance(date_inbound,tuple):
-            destinationDepartureDate = TransaviaHandle.convert_date(date_inbound[0]) + '-' + \
-                                  TransaviaHandle.convert_date(date_inbound[1])
+            destinationDepartureDate = TransaviaHandler.convert_date(date_inbound[0]) + '-' + \
+                                  TransaviaHandler.convert_date(date_inbound[1])
         else:
-            destinationDepartureDate = TransaviaHandle.convert_date(date_inbound)
+            destinationDepartureDate = TransaviaHandler.convert_date(date_inbound)
         
         
             
@@ -167,10 +167,10 @@ class TransaviaHandle:
         else:
             airport_list = origin.id
         if isinstance(date, tuple):
-            originDepartureDate = TransaviaHandle.convert_date(date[0]) + '-' + \
-                                  TransaviaHandle.convert_date(date[1])
+            originDepartureDate = TransaviaHandler.convert_date(date[0]) + '-' + \
+                                  TransaviaHandler.convert_date(date[1])
         else:
-            originDepartureDate = TransaviaHandle.convert_date(date)
+            originDepartureDate = TransaviaHandler.convert_date(date)
 
         params = urllib.parse.urlencode({
             'origin': airport_list,
@@ -215,15 +215,15 @@ class TransaviaHandle:
         else:
             airport_list = origin.id
         if isinstance(date_outbound,  tuple):
-            originDepartureDate = TransaviaHandle.convert_date(date_outbound[0])+'-'+ \
-                                  TransaviaHandle.convert_date(date_outbound[1])
+            originDepartureDate = TransaviaHandler.convert_date(date_outbound[0])+'-'+ \
+                                  TransaviaHandler.convert_date(date_outbound[1])
         else:
-            originDepartureDate = TransaviaHandle.convert_date(date_outbound)
+            originDepartureDate = TransaviaHandler.convert_date(date_outbound)
         if isinstance(date_inbound,tuple):
-            destinationDepartureDate = TransaviaHandle.convert_date(date_inbound[0]) + '-' + \
-                                  TransaviaHandle.convert_date(date_inbound[1])
+            destinationDepartureDate = TransaviaHandler.convert_date(date_inbound[0]) + '-' + \
+                                  TransaviaHandler.convert_date(date_inbound[1])
         else:
-            destinationDepartureDate = TransaviaHandle.convert_date(date_inbound)
+            destinationDepartureDate = TransaviaHandler.convert_date(date_inbound)
 
 
 

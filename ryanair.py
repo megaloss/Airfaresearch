@@ -1,12 +1,18 @@
 from classes import Airport, SingleFare, ReturnFare, Route
 import requests
 from utils import encode_datetime
-# import logging
+import logging
+import asyncio
+import aiohttp
+import json
+
+ROUND_TRIP_API_URL = 'https://www.ryanair.com/api/farfnd/v4/roundTripFares'
+SINGLE_TRIP_API_URL ='https://www.ryanair.com/api/farfnd/v4/oneWayFares'
 
 # # Set up logging
 
-# my_logger=logging.getLogger(__name__)
-# my_logger.setLevel(logging.DEBUG)
+logger=logging.getLogger(__name__)
+logger.setLevel(logging.WARNING)
 # file_handler = logging.FileHandler('ryanair.log')
 # log_formatter = logging.Formatter('%(asctime)s:%(levelname)s:%(module)s:%(funcName)s:%(message)s')
 
@@ -14,7 +20,7 @@ from utils import encode_datetime
 # my_logger.addHandler(file_handler)
 
 
-class RyanairHandle:
+class RyanairHandler:
 
     @staticmethod
     def read_airports():
@@ -33,7 +39,7 @@ class RyanairHandle:
 
     @staticmethod
     def get_fare(route, date,price_limit=1000):
-        SINGLE_TRIP_API_URL = 'https://services-api.ryanair.com/farfnd/3/oneWayFares'
+        # SINGLE_TRIP_API_URL = 'https://services-api.ryanair.com/farfnd/3/oneWayFares'
         if isinstance(date, tuple):
             outboundDepartureDateFrom, outboundDepartureDateTo = date[0].strftime('%Y-%m-%d'),date[1].strftime('%Y-%m-%d')
         else:
@@ -75,7 +81,7 @@ class RyanairHandle:
     @staticmethod
     def get_destinations(origin, date,price_limit=1000):
         # SINGLE_TRIP_API_URL = 'https://services-api.ryanair.com/farfnd/3/oneWayFares'
-        SINGLE_TRIP_API_URL ='https://www.ryanair.com/api/farfnd/v4/oneWayFares'
+        # SINGLE_TRIP_API_URL ='https://www.ryanair.com/api/farfnd/v4/oneWayFares'
         if isinstance(date, tuple):
             outboundDepartureDateFrom, outboundDepartureDateTo = date[0].strftime('%Y-%m-%d'),date[1].strftime('%Y-%m-%d')
         else:
@@ -115,9 +121,65 @@ class RyanairHandle:
         return destinations
 
 
+    # @staticmethod
+    # def get_return(route, date_outbound, date_inbound, limit=1000):
+    #     ROUND_TRIP_API_URL = 'https://www.ryanair.com/api/farfnd/v4/roundTripFares'
+    #     if isinstance(date_outbound, tuple):
+    #         outboundDepartureDateFrom, outboundDepartureDateTo = date_outbound[0].strftime('%Y-%m-%d'),date_outbound[1].strftime('%Y-%m-%d')
+    #     else:
+    #         outboundDepartureDateFrom = outboundDepartureDateTo = date_outbound.strftime('%Y-%m-%d')
+        
+    #     if isinstance(date_inbound, tuple):
+    #         inboundDepartureDateFrom, inboundDepartureDateTo = date_inbound[0].strftime('%Y-%m-%d'),date_inbound[1].strftime('%Y-%m-%d')
+    #     else:
+    #         inboundDepartureDateFrom = inboundDepartureDateTo = date_inbound.strftime('%Y-%m-%d')
+    #     language = 'en'
+    #     market = 'en-gb'
+    #     offset = 0
+    #     price_max = limit
+    #     fares = []
+    #     payload = {'departureAirportIataCode': route.from_airport.id,
+    #                'arrivalAirportIataCode': route.to_airport.id,
+    #                'inboundDepartureDateFrom': inboundDepartureDateFrom,
+    #                'inboundDepartureDateTo': inboundDepartureDateTo,
+    #                'language': language,
+    #             #    'limit': limit,
+    #                'market': market,
+    #                'offset': offset,
+    #                'outboundDepartureDateFrom': outboundDepartureDateFrom,
+    #                'outboundDepartureDateTo': outboundDepartureDateTo,
+    #                'priceValueTo': price_max}
+    #     #my_logger.debug (payload)
+
+    #     response = requests.get(ROUND_TRIP_API_URL, params=payload)
+    #     #my_logger.debug (response.url)
+    #     data = response.json()
+    #     #my_logger.debug (data)
+
+    #     if len(data) >= 1:
+
+    #         for item in data['fares']:
+    #             departure_date = encode_datetime(item['outbound']['departureDate'])
+    #             arrival_date = encode_datetime(item['outbound']['arrivalDate'])
+    #             price = item['outbound']['price']['value']
+    #             flight_number = item['outbound']['flightNumber']
+    #             outbound = SingleFare(route, departure_date, arrival_date, price, flight_number)
+    #             departure_date = encode_datetime(item['inbound']['departureDate'])
+    #             arrival_date = encode_datetime(item['inbound']['arrivalDate'])
+    #             price = item['inbound']['price']['value']
+    #             flight_number = item['inbound']['flightNumber']
+    #             inbound = SingleFare(route.invert(), departure_date, arrival_date, price, flight_number)
+    #             fares.append(ReturnFare(outbound,inbound))
+
+    #     else:
+    #         return False
+    #     return fares
+
+
+
     @staticmethod
-    def get_return(route, date_outbound, date_inbound, limit=1000):
-        ROUND_TRIP_API_URL = 'https://www.ryanair.com/api/farfnd/v4/roundTripFares'
+    async def get_returns(origin, destinations, date_outbound, date_inbound, airports):
+
         if isinstance(date_outbound, tuple):
             outboundDepartureDateFrom, outboundDepartureDateTo = date_outbound[0].strftime('%Y-%m-%d'),date_outbound[1].strftime('%Y-%m-%d')
         else:
@@ -127,13 +189,19 @@ class RyanairHandle:
             inboundDepartureDateFrom, inboundDepartureDateTo = date_inbound[0].strftime('%Y-%m-%d'),date_inbound[1].strftime('%Y-%m-%d')
         else:
             inboundDepartureDateFrom = inboundDepartureDateTo = date_inbound.strftime('%Y-%m-%d')
+        
         language = 'en'
         market = 'en-gb'
         offset = 0
-        price_max = limit
         fares = []
-        payload = {'departureAirportIataCode': route.from_airport.id,
-                   'arrivalAirportIataCode': route.to_airport.id,
+        tasks=[]
+        async with aiohttp.ClientSession() as session:
+            for airport in destinations:
+                outbound= {"departureStation":origin.id,"arrivalStation":airport.id,"from":outboundDepartureDateFrom,"to":outboundDepartureDateTo}
+                inbound = {"departureStation":airport.id,"arrivalStation":origin.id,"from":inboundDepartureDateFrom,"to":inboundDepartureDateTo}
+                flights=[outbound,inbound]
+                payload = {'departureAirportIataCode': origin.id,
+                   'arrivalAirportIataCode': airport.id,
                    'inboundDepartureDateFrom': inboundDepartureDateFrom,
                    'inboundDepartureDateTo': inboundDepartureDateTo,
                    'language': language,
@@ -142,16 +210,32 @@ class RyanairHandle:
                    'offset': offset,
                    'outboundDepartureDateFrom': outboundDepartureDateFrom,
                    'outboundDepartureDateTo': outboundDepartureDateTo,
-                   'priceValueTo': price_max}
-        #my_logger.debug (payload)
+                #    'priceValueTo': price_max
+                   }
 
-        response = requests.get(ROUND_TRIP_API_URL, params=payload)
-        #my_logger.debug (response.url)
-        data = response.json()
-        #my_logger.debug (data)
+                tasks.append(asyncio.create_task(session.get(ROUND_TRIP_API_URL, params=payload)))
+                
 
-        if len(data) >= 1:
+            responses = await asyncio.gather(*tasks)
+        for response in responses:
+            logger.debug (response.status)
+            if response.status !=200:
+                logger.error(f"server returned {response}")
+                return []
+            logger.debug (await response.text())
+            data = await response.json()
 
+            if len(data) < 1:
+                logger.info ('No flights found, returning empty appay')
+                return []
+            origin = airports.get(data['fares'][0]['outbound']['departureAirport']['iataCode'])
+            destination = airports.get(data['fares'][0]['outbound']['arrivalAirport']['iataCode'])
+            if not origin or not destination:
+                logger.warning ('something went wrong with the airport code')
+                continue
+            
+            route = Route (origin, destination)
+            
             for item in data['fares']:
                 departure_date = encode_datetime(item['outbound']['departureDate'])
                 arrival_date = encode_datetime(item['outbound']['arrivalDate'])
@@ -165,32 +249,35 @@ class RyanairHandle:
                 inbound = SingleFare(route.invert(), departure_date, arrival_date, price, flight_number)
                 fares.append(ReturnFare(outbound,inbound))
 
-        else:
-            return False
+        
         return fares
 
+
     @staticmethod
-    def get_cheapest_return(origin, date_outbound, date_inbound, airports, limit=1000):
-        # print ('returning empty array !')
-        # return []
+    async def get_cheapest_return(origin, date_outbound, date_inbound, airports, limit=1000):
+        #return []
+
 
         flights=[]
-        
-        destinations = RyanairHandle.get_destinations(origin, date_outbound)
+        destinations = RyanairHandler.get_destinations(origin, date_outbound)
         if not destinations:
+            logger.debug('No destinations available')
             return []
-        print(destinations)
-        
-        for airport in destinations:   
-            if airports[airport] == origin:
+        logger.debug ('Destinations found :')
+        logger.debug (destinations)
+
+        dest_airports=[]
+        for airport in destinations:
+            destination_airport = airports.get(airport)
+            if not destination_airport or destination_airport == origin:
                 continue
-        
-            my_route = Route(origin, airports[airport])
-            flight = RyanairHandle.get_return(my_route, date_outbound, date_inbound)
-            if flight:
-                flights.extend(flight)
-        #my_logger.debug (flights)
+            dest_airports.append(destination_airport)
 
-        
+        flights = await RyanairHandler.get_returns(origin, dest_airports, date_outbound, date_inbound, airports)
+        logger.debug (flights)
+
+        if not flights:
+            logger.debug('returning empty array...')
+            return []
         return flights
-
+        

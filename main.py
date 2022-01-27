@@ -1,10 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-import wizzair
-from ryanair import RyanairHandle
-from transavia import TransaviaHandle
-from wizzair import WizzairHandle
+# import wizzair
+from ryanair import RyanairHandler
+from transavia import TransaviaHandler
+from wizzair import WizzairHandler
 from datetime import datetime, timedelta, date
 import pickle
 from classes import Airport, Route, SingleFare, ReturnFare
@@ -35,8 +35,7 @@ app.add_middleware(
 )
 
 airports= pickle.load(open('airports.p', 'rb'))
-my_handlers = [TransaviaHandle,RyanairHandle,WizzairHandle]
-#my_handlers = [TransaviaHandle,RyanairHandle]
+my_handlers = [TransaviaHandler,RyanairHandler,WizzairHandler]
 origin = [airports['RTM'], airports['EIN'], airports['AMS'], airports['CRL'], airports['BRU']]
 date_from = (datetime(2022, 2, 25),datetime(2022, 2, 28))
 date_to = (datetime(2022, 3, 6),datetime(2022, 3, 8))
@@ -70,7 +69,7 @@ async def get_all_flights_from(airport_id, outbound_date_from=date_from[0],outbo
     flights=[]
     
     for handler in my_handlers:
-        if handler == WizzairHandle:
+        if handler == WizzairHandler or handler == RyanairHandler:
             extras= await handler.get_cheapest_return(airport_from, outbound_date, inbound_date, airports)
         else:
             extras=handler.get_cheapest_return(airport_from, outbound_date, inbound_date, airports)
