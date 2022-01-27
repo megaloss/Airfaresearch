@@ -6,11 +6,12 @@ import asyncio
 import aiohttp
 import json
 import logging
+import time
 
 # Set up logging
 
 logger=logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 # file_handler = logging.FileHandler('wizzair.log')
 # log_formatter = logging.Formatter('%(asctime)s:%(levelname)s:%(module)s:%(funcName)s:%(message)s')
 
@@ -250,7 +251,7 @@ class WizzairHandler:
             destination = airports.get(data['outboundFlights'][0]['arrivalStation'])
             if not origin or not destination:
                 continue
-            print (f'A flight from {origin} to {destination}')
+            # print (f'A flight from {origin} to {destination}')
 
 
             for item in data['outboundFlights']:
@@ -280,13 +281,12 @@ class WizzairHandler:
     
     @staticmethod
     async def get_cheapest_return(origin, date_outbound, date_inbound, airports, limit=1000):
-        #return []
-
-
+        start = time.time()
         flights=[]
         destinations = WizzairHandler.get_destinations(origin, date_outbound)
         if not destinations:
             logger.debug('No destinations available')
+            logger.info (f'Finished in {str(round(time.time()-start,2))} sec.')
             return []
         logger.debug ('Destinations found :')
         logger.debug (destinations)
@@ -304,7 +304,9 @@ class WizzairHandler:
 
         if not flights:
             logger.debug('returning empty array...')
+            logger.info (f'Finished in {str(round(time.time()-start,2))} sec.')
             return []
+        logger.info (f'Finished in {str(round(time.time()-start,2))} sec.')
         return flights
         
 

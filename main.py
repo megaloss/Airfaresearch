@@ -15,6 +15,9 @@ import pickle
 app=FastAPI()
 import logging
 
+logger=logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
 origins = [
     "http://localhost",
     "https://localhost",
