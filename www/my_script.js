@@ -69,7 +69,6 @@ function onMapClick(e) {
         outbound_date_to: outbound_date_to,
         inbound_date_from: inbound_date_from,
         inbound_date_to: inbound_date_to,
-
     }))
     .then(response => response.json())
     .then (function (data){
@@ -133,7 +132,7 @@ function onMapClick(e) {
 
 
 
-fetch('http://localhost:8000/get_origin_airports/')
+fetch('http://127.0.0.1:8000/get_origin_airports/')
   .then(response => response.json())
   .then(function(data){
     const codes=Object.keys(data);

@@ -2,11 +2,33 @@ from classes import Airport, SingleFare, ReturnFare, Route
 import requests
 from utils import encode_datetime
 from datetime import timedelta
+import asyncio
+import aiohttp
+import json
+import logging
+import time
 
-AIRPORTS_URL = 'https://be.wizzair.com/11.17.2/Api/asset/map'
-TIMETABLE_URL = 'https://be.wizzair.com/11.17.2/Api/search/timetable'
+# Set up logging
+
+logger=logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+# file_handler = logging.FileHandler('wizzair.log')
+# log_formatter = logging.Formatter('%(asctime)s:%(levelname)s:%(module)s:%(funcName)s:%(message)s')
+
+# file_handler.setFormatter(log_formatter)
+# logger.addHandler(file_handler)
+
+
+#logging.basicConfig(level=logging.DEBUG, format='%(asctime)s:%(levelname)s:%(module)s:%(funcName)s:%(message)s')
+
+AIRPORTS_URL = 'https://be.wizzair.com/12.0.0/Api/asset/map'
+#TIMETABLE_URL = 'https://be.wizzair.com/11.17.2/Api/search/timetable'
+TIMETABLE_URL = 'https://be.wizzair.com/12.0.0/Api/search/timetable'
 #TIMETABLE_URL = 'https://be.wizzair.com/11.17.0/Api/assets/timechart'
-headers={"accept": "application/json, text/plain, */*",
+
+
+headers={
+"accept": "application/json, text/plain, */*",
 "accept-encoding": "gzip, deflate, br",
 "accept-language": "en-GB,en;q=0.9,ru-RU;q=0.8,ru;q=0.7,en-US;q=0.6,nl;q=0.5",
 "cache-control": "no-cache",
@@ -15,14 +37,16 @@ headers={"accept": "application/json, text/plain, */*",
 "dnt": "1",
 "origin": "https://wizzair.com",
 "pragma": "no-cache",
+# "referer": "https://wizzair.com/nl-nl/vluchten/vind-uw-prijs/boedapest/brussel-charleroi",
+"sec-ch-ua": '" Not A;Brand";v="99", "Chromium";v="96", "Google Chrome";v="96"',
 "sec-ch-ua-mobile": "?0",
 "sec-ch-ua-platform": "Linux",
 "sec-fetch-dest": "empty",
 "sec-fetch-mode": "cors",
 "sec-fetch-site": "same-site",
-"user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.93 Safari/537.36",
+"user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.93 Safari/537.36"
 }
-class WizzairHandle:
+class WizzairHandler:
 
     @staticmethod
     def read_airports():
@@ -48,8 +72,8 @@ class WizzairHandle:
             airports = response.json()
 
         except Exception as e:
-            print('Error: ', e)
-            return False
+            logger.error('Error: ', e)
+            return []
         airport_dict = {}
         for airport in airports['cities']:
             airport_dict[airport['iata']] = Airport(airport['iata'], get_airport_name(airport['shortName']),
@@ -72,12 +96,16 @@ class WizzairHandle:
         }
 
         try:
-            response = requests.get(AIRPORTS_URL, params=payload, headers=headers, timeout=3)
+            #response = requests.get(AIRPORTS_URL, params=payload, headers=headers, timeout=3)
+            response = requests.get(AIRPORTS_URL, headers=headers, timeout=7)
+            if response.status_code !=200:
+                logger.error ("Got no destinations from api")
+                return []
             airports = response.json()
 
         except Exception as e:
-            print('Error: ', e)
-            return False
+            logger.error(e)
+            return []
         connections =[]
         for city in airports['cities']:
             if city['iata'] != origin.id:
@@ -88,7 +116,7 @@ class WizzairHandle:
                 connections.append(conn['iata'])
         if len(connections)>0:
             return connections
-        return False
+        return []
     
 
     @staticmethod
@@ -121,15 +149,15 @@ class WizzairHandle:
         
 
         #print ("payload = ", payload)
-
+        
         response = requests.post(TIMETABLE_URL, json=payload, headers=headers)
-        #print (response.text)
+        #logger.debug (response.text)
         data = response.json()
-        #print (data)
+        #logger.debug (data)
         if len (data['outboundFlights'])<1 or len (data["returnFlights"])<1:
-            return False
+            return []
         if data['outboundFlights'][0]['price']['currencyCode']!="EUR":
-            print ("************WARNING***************** : Prices are not in EUR !!! ")
+            logger.warning("Prices are not in EUR !!! ")
 
         inbounds=[]
         outbounds=[]
@@ -148,13 +176,13 @@ class WizzairHandle:
                 inbounds.append([departure_date,price])
 
 
-        best_outbound, best_inbound = WizzairHandle.get_best_pair(outbounds, inbounds)
+        best_outbound, best_inbound = WizzairHandler.get_best_pair(outbounds, inbounds)
         flight_number='WZ000'
         if best_outbound and best_inbound:
             outbound = SingleFare(route, best_outbound[0], best_outbound[0], best_outbound[1], flight_number)
             inbound = SingleFare(route.invert(), best_inbound[0], best_inbound[0], best_inbound[1], flight_number)
             return [ReturnFare(outbound,inbound)] # list is expected !
-        return False
+        return []
 
     @staticmethod
     def get_best_pair(outbounds, inbounds):
@@ -163,16 +191,7 @@ class WizzairHandle:
 
         while (outbounds_sorted and inbounds_sorted):
             if inbounds_sorted[0][0]-outbounds_sorted[0][0] > timedelta(days=1):
-                # print ("the best option is: ", outbounds_sorted[0], "-->", inbounds_sorted[0])
-                # print ("stay duration is: ", inbounds_sorted[0][0]-outbounds_sorted[0][0])
-                # print ("price is: ",inbounds_sorted[0][1]+outbounds_sorted[0][1])
                 return outbounds_sorted[0], inbounds_sorted[0]
-            #print ('Next attempt... outbounds:')
-            # for item in outbounds_sorted:
-            #     print (item)
-            # print ("returns:")
-            # for item in inbounds_sorted:
-            #     print (item)
             if len(outbounds_sorted)> len (inbounds_sorted):
                 outbounds_sorted.pop(0)
             else:
@@ -180,30 +199,114 @@ class WizzairHandle:
         return False, False
 
     @staticmethod
-    def get_cheapest_return(origin, date_outbound, date_inbound, airports, limit=1000):
+    async def get_returns(origin, destinations, date_outbound, date_inbound, airports):
+
+        if isinstance(date_outbound, tuple):
+            outboundDepartureDateFrom, outboundDepartureDateTo = date_outbound[0].strftime('%Y-%m-%d'),date_outbound[1].strftime('%Y-%m-%d')
+        else:
+            outboundDepartureDateFrom = outboundDepartureDateTo = date_outbound.strftime('%Y-%m-%d')
+        
+        if isinstance(date_inbound, tuple):
+            inboundDepartureDateFrom, inboundDepartureDateTo = date_inbound[0].strftime('%Y-%m-%d'),date_inbound[1].strftime('%Y-%m-%d')
+        else:
+            inboundDepartureDateFrom = inboundDepartureDateTo = date_inbound.strftime('%Y-%m-%d')
+        
+        language = 'en'
+        market = 'en-gb'
+        offset = 0
+        fares = []
+        tasks=[]
+        async with aiohttp.ClientSession() as session:
+            for airport in destinations:
+                outbound= {"departureStation":origin.id,"arrivalStation":airport.id,"from":outboundDepartureDateFrom,"to":outboundDepartureDateTo}
+                inbound = {"departureStation":airport.id,"arrivalStation":origin.id,"from":inboundDepartureDateFrom,"to":inboundDepartureDateTo}
+                flights=[outbound,inbound]
+                payload = {"flightList":flights,
+                            "priceType":"regular", 
+                            "adultCount":1,
+                            "childCount":0,
+                            "infantCount":0,
+                            }
+
+                #print (json.dumps(payload).replace(' ',''))
+                tasks.append(asyncio.create_task(session.post(TIMETABLE_URL, data=json.dumps(payload).replace(' ',''), headers=headers)))
+                
+
+            responses = await asyncio.gather(*tasks)
+        for response in responses:
+            logger.debug (response.status)
+            if response.status !=200:
+                logger.error(f"server returned {response}")
+                return []
+            logger.debug (await response.text())
+            data = await response.json()
+            if len (data['outboundFlights'])<1 or len (data["returnFlights"])<1:
+                continue
+            if data['outboundFlights'][0]['price']['currencyCode']!="EUR":
+                logger.warning("************WARNING***************** : Prices are not in EUR !!! ")
+
+            inbounds=[]
+            outbounds=[]
+            origin=airports.get(data['outboundFlights'][0]['departureStation'])
+            destination = airports.get(data['outboundFlights'][0]['arrivalStation'])
+            if not origin or not destination:
+                continue
+            # print (f'A flight from {origin} to {destination}')
 
 
+            for item in data['outboundFlights']:
+                if item['priceType'] == "price":
+                    departure_date = encode_datetime(item["departureDates"][0])
+                    price = item['price']['amount']
+                    outbounds.append([departure_date,price])
+                
+            for item in data["returnFlights"]:
+                if item['priceType'] == "price":
+                    departure_date = encode_datetime(item["departureDates"][0])
+                    price = item['price']['amount']
+                    inbounds.append([departure_date,price])
+
+
+                best_outbound, best_inbound = WizzairHandler.get_best_pair(outbounds, inbounds)
+                flight_number='WZ000'
+            if best_outbound and best_inbound:
+                route=Route (origin,destination)
+                outbound = SingleFare(route, best_outbound[0], best_outbound[0], best_outbound[1], flight_number)
+                inbound = SingleFare(route.invert(), best_inbound[0], best_inbound[0], best_inbound[1], flight_number)
+                fares.append(ReturnFare(outbound,inbound)) # list is expected !
+            continue
+        return fares
+
+
+    
+    @staticmethod
+    async def get_cheapest_return(origin, date_outbound, date_inbound, airports, limit=1000):
+        start = time.time()
         flights=[]
-        destinations = WizzairHandle.get_destinations(origin, date_outbound)
+        destinations = WizzairHandler.get_destinations(origin, date_outbound)
         if not destinations:
-            return False
-        print ('destinations available from Wizzair are:', destinations)
-        # print ('for debugging purpose slicing to 5 items...')
-        # destinations=destinations[:5]
-        # print ('destinations available from Wizzair are:', destinations)
+            logger.debug('No destinations available')
+            logger.info (f'Finished in {str(round(time.time()-start,2))} sec.')
+            return []
+        logger.debug ('Destinations found :')
+        logger.debug (destinations)
+
+        dest_airports=[]
+        #tasks=[]
         for airport in destinations:
             destination_airport = airports.get(airport)
             if not destination_airport or destination_airport == origin:
                 continue
-            
-            my_route = Route(origin, destination_airport)
-            flight = WizzairHandle.get_return(my_route, date_outbound, date_inbound)
-            print ('requesting flights from ',origin,' to ', destination_airport )
-            if flight:
-                flights.extend(flight)
-        #print (flights)
+            dest_airports.append(destination_airport)
 
-        
+        flights = await WizzairHandler.get_returns(origin, dest_airports, date_outbound, date_inbound, airports)
+        logger.debug (flights)
+
+        if not flights:
+            logger.debug('returning empty array...')
+            logger.info (f'Finished in {str(round(time.time()-start,2))} sec.')
+            return []
+        logger.info (f'Finished in {str(round(time.time()-start,2))} sec.')
         return flights
         
 

@@ -1,10 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-import wizzair
-from ryanair import RyanairHandle
-from transavia import TransaviaHandle
-from wizzair import WizzairHandle
+# import wizzair
+from ryanair import RyanairHandler
+from transavia import TransaviaHandler
+from wizzair import WizzairHandler
 from datetime import datetime, timedelta, date
 import pickle
 from classes import Airport, Route, SingleFare, ReturnFare
@@ -13,13 +13,18 @@ airports = {}
 
 import pickle
 app=FastAPI()
+import logging
 
+logger=logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 origins = [
-    "http://localhost",
+    "http://0.0.0.0",
     "https://localhost",
+    "http://localhost:80",
     "http://localhost:8000",
     "http://localhost:5500",
+    "http://127.0.0.1",
     "http://127.0.0.1:8000",
     "http://127.0.0.1:5500",
     "http://192.168.0.15:8000",
@@ -35,7 +40,7 @@ app.add_middleware(
 )
 
 airports= pickle.load(open('airports.p', 'rb'))
-my_handles = [TransaviaHandle(),RyanairHandle(),WizzairHandle()]
+my_handlers = [TransaviaHandler,RyanairHandler,WizzairHandler]
 origin = [airports['RTM'], airports['EIN'], airports['AMS'], airports['CRL'], airports['BRU']]
 date_from = (datetime(2022, 2, 25),datetime(2022, 2, 28))
 date_to = (datetime(2022, 3, 6),datetime(2022, 3, 8))
@@ -52,18 +57,34 @@ async def get_flights_from(airport_id):
 
 @app.get('/get_all_flights_from/{airport_id}')
 async def get_all_flights_from(airport_id, outbound_date_from=date_from[0],outbound_date_to=date_from[1], inbound_date_from=date_to[0],inbound_date_to=date_to[1]):
-    airport_from = airports[airport_id]
+    airport_from = airports.get(airport_id)
+    if not airport_from:
+        return []
+
+    # if airport_id=='CRL':
+    #     return 'Oh crap !'
+    
     outbound_date_from = datetime.strptime(outbound_date_from,'%d-%m-%Y')
     outbound_date_to = datetime.strptime(outbound_date_to,'%d-%m-%Y')
     outbound_date=(outbound_date_from,outbound_date_to)
     inbound_date_from = datetime.strptime(inbound_date_from,'%d-%m-%Y')
     inbound_date_to = datetime.strptime(inbound_date_to,'%d-%m-%Y')
     inbound_date=(inbound_date_from,inbound_date_to)
-    print (f'got request for {airport_id}, outbound_date = {(outbound_date_from, outbound_date_to)}, inbound_date= {(inbound_date_from, inbound_date_to)}')
+    logging.debug (f'got request for {airport_id}, outbound_date = {(outbound_date_from, outbound_date_to)}, inbound_date= {(inbound_date_from, inbound_date_to)}')
     flights=[]
-    for handle in my_handles:
-        extras=handle.get_cheapest_return(airport_from, outbound_date, inbound_date, airports)
+    
+    for handler in my_handlers:
+        if handler == WizzairHandler or handler == RyanairHandler:
+            extras= await handler.get_cheapest_return(airport_from, outbound_date, inbound_date, airports)
+        else:
+            extras=handler.get_cheapest_return(airport_from, outbound_date, inbound_date, airports)
         if extras:
+            logging.debug ('Got extras:',extras)
             flights.extend(extras)
-    print (flights)
+        else: 
+            logging.info (handler.__name__ + 'got empty array, skipping')
+    #print (flights)
+    if not flights:
+        logging.info ("No flights found !")
+        return []
     return flights
