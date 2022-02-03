@@ -19,10 +19,12 @@ logger=logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 origins = [
-    "http://localhost",
+    "http://0.0.0.0",
     "https://localhost",
+    "http://localhost:80",
     "http://localhost:8000",
     "http://localhost:5500",
+    "http://127.0.0.1",
     "http://127.0.0.1:8000",
     "http://127.0.0.1:5500",
     "http://192.168.0.15:8000",

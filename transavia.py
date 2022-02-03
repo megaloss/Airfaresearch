@@ -75,7 +75,8 @@ class TransaviaHandler:
             conn.request("GET", "/v1/flightoffers/?%s" % params, "{body}", headers)
             response = conn.getresponse()
             data = response.read()
-            data = json.loads(data)
+            if data:
+                data = json.loads(data)
             conn.close()
         except Exception as e:
             logger.error("[ERROR: {0}]".format(e))
