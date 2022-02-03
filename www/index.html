@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Flight search</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+   integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+   crossorigin=""/>
+    <link rel="stylesheet" href="style.css" >
+   
+</head>
+<body>
+    <div id="map"></div>
+    <div id="dates">
+        <h2>Select date range:</h2>
+        <div> 
+        <label for="date_outbound">Departing dates:</label>
+        <br>
+        <input class="date_box" name="date_outbound" >
+        </div>
+        <div>
+        <label for="date_inbound">Returning dates:</label>
+        <br>
+        <input class="date_box" name="date_inbound" >
+        </div>
+    </div>
+    <div id = "prices" class="prices_box">
+        <h2>Select your price range:</h2>
+
+            <div class = "price_option">
+            <input type="radio" id="80" name="price" value="80">
+            <label for="1"> &#60; 80 eur </label>
+            </div>
+
+            <div class = "price_option">
+            <input type="radio" id="120" name="price" value="120">
+            <label for="2">&#60; 120 eur</label>
+            </div>
+
+            <div class = "price_option">
+            <input type="radio" id="200" name="price" value="200">
+            <label for="3">&#60; 200 eur</label>
+            </div>
+            <div class = "price_option">
+            <input type="radio" id="0" name="price" value="1000" checked>
+            <label for="0">unlim</label>
+            </div>
+
+
+    </div>
+
+
+</body>
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+crossorigin=""></script>
+<!-- Include Required Prerequisites -->
+<script type="text/javascript" src="//cdn.jsdelivr.net/jquery/1/jquery.min.js"></script>
+<script type="text/javascript" src="//cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap/3/css/bootstrap.css" />
+ 
+<!-- Include Date Range Picker -->
+<script type="text/javascript" src="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.js"></script>
+<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.css" />
+ <script src="my_script.js"></script>
+</html>
