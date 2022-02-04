@@ -64,7 +64,7 @@ function onMapClick(e) {
     $("body").css("cursor", "progress");
     $('.leaflet-container').css('cursor','progress');
 
-    fetch('http://localhost:8000/get_all_flights_from/'+e.target.options.name+"?" + new URLSearchParams({
+    fetch('http://127.0.0.1:8000/get_all_flights_from/'+e.target.options.name+"?" + new URLSearchParams({
         outbound_date_from: outbound_date_from,
         outbound_date_to: outbound_date_to,
         inbound_date_from: inbound_date_from,
