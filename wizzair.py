@@ -60,9 +60,9 @@ class WizzairHandler:
                 return text.split('(')[1].split('(')[0].strip('()')
             return text.split(' ')[-1:][0]
 
-        headers = {
-            'user-agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Mobile Safari/537.36'
-        }
+        # headers = {
+        #     'user-agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Mobile Safari/537.36'
+        # }
         payload = {
             'languageCode': 'en - gb'
         }
@@ -88,9 +88,9 @@ class WizzairHandler:
         # else:
         #     outboundDepartureDateFrom = outboundDepartureDateTo = date.strftime('%Y-%m-%d')
 
-        headers = {
-            'user-agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Mobile Safari/537.36'
-        }
+        # headers = {
+        #     'user-agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Mobile Safari/537.36'
+        # }
         payload = {
             'languageCode': 'en - gb'
         }
