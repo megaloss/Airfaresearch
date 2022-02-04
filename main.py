@@ -14,7 +14,7 @@ airports = {}
 import pickle
 app=FastAPI()
 import logging
-import os
+import requests
 
 logger=logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -25,11 +25,15 @@ origins = [
     "http://127.0.0.1:5500",
     "http://192.168.0.15",
 ]
-if os.path.exists('ip.p'):
-    with open ('ip.p','r') as f:
-        my_ip = f.readline()
-    my_ip = 'http://' + my_ip
-    origins.append(my_ip)
+
+try:
+    my_ip = requests.get('http://169.254.169.254/latest/meta-data/public-ipv4')
+    my_ip = my_ip.text
+    origins.append('http://' + my_ip)
+except:
+    print ('Public ip not found')
+
+
 
 app.add_middleware(
     CORSMiddleware,
