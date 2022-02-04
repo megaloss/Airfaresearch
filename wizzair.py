@@ -7,6 +7,9 @@ import aiohttp
 import json
 import logging
 import time
+import pickle
+import os.path
+
 
 # Set up logging
 
@@ -25,7 +28,7 @@ AIRPORTS_URL = 'https://be.wizzair.com/12.0.0/Api/asset/map'
 #TIMETABLE_URL = 'https://be.wizzair.com/11.17.2/Api/search/timetable'
 TIMETABLE_URL = 'https://be.wizzair.com/12.0.0/Api/search/timetable'
 #TIMETABLE_URL = 'https://be.wizzair.com/11.17.0/Api/assets/timechart'
-
+timeout = 15
 
 headers={
 "accept": "application/json, text/plain, */*",
@@ -82,7 +85,7 @@ class WizzairHandler:
         return airport_dict
 
     @staticmethod
-    def get_destinations(origin, date,price_limit=1000):
+    def get_destinations(origin, date=False,price_limit=1000):
         # if isinstance(date, tuple):
         #     outboundDepartureDateFrom, outboundDepartureDateTo = date[0].strftime('%Y-%m-%d'),date[1].strftime('%Y-%m-%d')
         # else:
@@ -94,20 +97,25 @@ class WizzairHandler:
         payload = {
             'languageCode': 'en - gb'
         }
+        if not os.path.exists('wizz_flights.p'):
+            try:
+                response = requests.get(AIRPORTS_URL, headers=headers, timeout=20)
+                if response.status_code !=200:
+                    logger.error ("Got no destinations from api")
+                    return []
+                all_flights = response.json()
+                if all_flights:
+                    with open('wizz_flights.p', 'wb') as f:
+                        pickle.dump(all_flights,f)
 
-        try:
-            #response = requests.get(AIRPORTS_URL, params=payload, headers=headers, timeout=3)
-            response = requests.get(AIRPORTS_URL, headers=headers, timeout=7)
-            if response.status_code !=200:
-                logger.error ("Got no destinations from api")
+            except Exception as e:
+                logger.error(e)
                 return []
-            airports = response.json()
-
-        except Exception as e:
-            logger.error(e)
-            return []
+        else:
+            with open('wizz_flights.p', 'rb') as f:
+                    all_flights = pickle.load(f)
         connections =[]
-        for city in airports['cities']:
+        for city in all_flights['cities']:
             if city['iata'] != origin.id:
                 continue
             
