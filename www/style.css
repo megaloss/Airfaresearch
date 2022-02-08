@@ -4,7 +4,6 @@ width: 80%;
 left: 20%; }
 
 #dates { position: fixed;
-    left: 0;
     top: 5%;
     height: 40%;
     width: 16%;
@@ -26,7 +25,7 @@ left: 20%; }
     top: 50%;
     height: 45%;
     width: 16%;
-    left: 2px; 
+    left: 2%; 
     
     border: 2px solid #1C6EA4;
     -webkit-border-radius: 10px;
@@ -46,13 +45,15 @@ left: 20%; }
     padding-left:10%;
     font-size: 1.2vw;
 }
-#hh2 {
+.hh2 {
+    margin-top: 5%;
     font-size: 2vw;
+    text-align: center;
 }
 label {
     display: inline-block;
     max-width: 100%;
-    margin-bottom: 5px;
+    margin-bottom: 5%;
     font-weight: bold;
     font-size: 1.5vw;
 }
