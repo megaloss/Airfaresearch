@@ -49,6 +49,7 @@ left: 20%; }
     margin-top: 5%;
     font-size: 2vw;
     text-align: center;
+    margin-bottom: 5%;
 }
 label {
     display: inline-block;
@@ -56,4 +57,8 @@ label {
     margin-bottom: 5%;
     font-weight: bold;
     font-size: 1.5vw;
+}
+
+input[type="radio"] {
+    margin: 5% 0 0;
 }
