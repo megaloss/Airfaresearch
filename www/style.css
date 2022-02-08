@@ -1,13 +1,14 @@
-#map { height: 900px;
+#map { position:fixed;
+height: 100%;
 width: 80%;
-left: 350px; }
+left: 20%; }
 
 #dates { position: fixed;
     left: 0;
     top: 40px;
     height: 200px;
-    width: 300px;
-    left: 30px; 
+    width: 16%;
+    left: 2%; 
     text-align: center;
     border: 2px solid #1C6EA4;
     -webkit-border-radius: 10px;
@@ -22,8 +23,8 @@ left: 350px; }
 
     top: 300px;
     height: 300px;
-    width: 300px;
-    left: 30px; 
+    width: 95%;
+    left: 0px; 
     
     border: 2px solid #1C6EA4;
     -webkit-border-radius: 10px;
