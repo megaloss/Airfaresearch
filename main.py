@@ -24,6 +24,11 @@ origins = [
     "http://127.0.0.1",
     "http://127.0.0.1:5500",
     "http://192.168.0.15",
+    "http://flexifly.nl",
+    "http://www.flexifly.nl",
+    "https://www.flexifly.nl",
+    "http://flexifly.nl"
+
 ]
 
 try:
