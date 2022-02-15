@@ -37,11 +37,9 @@ try:
 except:
     print ('Public ip not found')
 
-<<<<<<< HEAD
-requests_cache.install_cache('flights_cache', backend='sqlite', expire_after=600, allowable_methods=('GET', 'POST'),)
-=======
-requests_cache.install_cache('flights_cache', backend='sqlite', expire_after=600)
->>>>>>> 3ff5a29a08130e497b48f82eeac195ee06d241c5
+
+requests_cache.install_cache('flights_cache', backend='sqlite', expire_after=600, allowable_methods=('GET', 'POST'))
+
 
 app.add_middleware(
     CORSMiddleware,

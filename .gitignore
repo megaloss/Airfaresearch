@@ -1,7 +1,6 @@
 __pycache__/
 *.log
 *.pyc
-<<<<<<< HEAD
+
 commands.info
-=======
->>>>>>> 3ff5a29a08130e497b48f82eeac195ee06d241c5
+
