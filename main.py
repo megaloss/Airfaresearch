@@ -7,7 +7,8 @@ from datetime import datetime, timedelta, date
 import pickle
 from classes import Airport, Route, SingleFare, ReturnFare
 from utils import encode_datetime
-#import requests_cache
+
+
 airports = {}
 
 import pickle
@@ -30,15 +31,12 @@ origins = [
 
 ]
 
-try:
-    my_ip = requests.get('http://169.254.169.254/latest/meta-data/public-ipv4')
-    my_ip = my_ip.text
-    origins.append('http://' + my_ip)
-except:
-    print ('Public ip not found')
-
-
-#requests_cache.install_cache('flights_cache', backend='sqlite', expire_after=600, allowable_methods=('GET', 'POST'))
+# try:
+#     my_ip = requests.get('http://169.254.169.254/latest/meta-data/public-ipv4')
+#     my_ip = my_ip.text
+#     origins.append('http://' + my_ip)
+# except:
+#     print ('Public ip not found')
 
 
 app.add_middleware(
@@ -59,14 +57,17 @@ date_to = (datetime(2022, 3, 6),datetime(2022, 3, 8))
 async def get_origin_airports():
     return origin
 
+
 @app.get('/get_flights_from/{airport_id}')
 async def get_flights_from(airport_id):
     my_route = Route(origin, airports[airport_id])
     flights = my_handle.get_return(my_route, date_from, date_to)
     return flights
 
+
 @app.get('/get_all_flights_from/{airport_id}')
 async def get_all_flights_from(airport_id, outbound_date_from=date_from[0],outbound_date_to=date_from[1], inbound_date_from=date_to[0],inbound_date_to=date_to[1]):
+    print('working...')
     airport_from = airports.get(airport_id)
     if not airport_from:
         return []
@@ -93,7 +94,6 @@ async def get_all_flights_from(airport_id, outbound_date_from=date_from[0],outbo
             flights.extend(extras)
         else: 
             logging.info (handler.__name__ + 'got empty array, skipping')
-    #print (flights)
     if not flights:
         logging.info ("No flights found !")
         return []

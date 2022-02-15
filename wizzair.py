@@ -10,6 +10,7 @@ import time
 import pickle
 import os.path
 
+from aiocache import cached
 
 
 # Set up logging
@@ -74,7 +75,7 @@ class WizzairHandler:
         }
 
         try:
-            print ('params=',params)
+            #print ('params=',params)
             response = requests.get(AIRPORTS_URL, params=payload, headers=headers)
             airports = response.json()
 
@@ -211,6 +212,7 @@ class WizzairHandler:
         return False, False
 
     @staticmethod
+    @cached(ttl=600)
     async def get_returns(origin, destinations, date_outbound, date_inbound, airports):
 
         if isinstance(date_outbound, tuple):

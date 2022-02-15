@@ -6,6 +6,9 @@ import asyncio
 import aiohttp
 import json
 import time
+from aiocache import cached
+
+
 
 
 ROUND_TRIP_API_URL = 'https://www.ryanair.com/api/farfnd/v4/roundTripFares'
@@ -257,6 +260,7 @@ class RyanairHandler:
 
 
     @staticmethod
+    @cached(ttl=600)
     async def get_cheapest_return(origin, date_outbound, date_inbound, airports, limit=1000):
         start = time.time()
 
