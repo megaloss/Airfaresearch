@@ -44,13 +44,12 @@ headers={
 "dnt": "1",
 "origin": "https://wizzair.com",
 "pragma": "no-cache",
-# "referer": "https://wizzair.com/nl-nl/vluchten/vind-uw-prijs/boedapest/brussel-charleroi",
-"sec-ch-ua": '" Not A;Brand";v="99", "Chromium";v="96", "Google Chrome";v="96"',
-"sec-ch-ua-mobile": "?0",
-"sec-ch-ua-platform": "Linux",
-"sec-fetch-dest": "empty",
-"sec-fetch-mode": "cors",
-"sec-fetch-site": "same-site",
+#"sec-ch-ua": '" Not A;Brand";v="99", "Chromium";v="96", "Google Chrome";v="96"',
+#"sec-ch-ua-mobile": "?0",
+#"sec-ch-ua-platform": "Linux",
+#"sec-fetch-dest": "empty",
+#"sec-fetch-mode": "cors",
+#"sec-fetch-site": "same-site",
 "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.93 Safari/537.36"
 }
 class WizzairHandler:
