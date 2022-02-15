@@ -6,9 +6,14 @@ import asyncio
 import aiohttp
 import json
 import time
+#import requests_cache
+
 
 ROUND_TRIP_API_URL = 'https://www.ryanair.com/api/farfnd/v4/roundTripFares'
 SINGLE_TRIP_API_URL ='https://www.ryanair.com/api/farfnd/v4/oneWayFares'
+
+#requests_cache.install_cache('ryan_cache', backend='sqlite', expire_after=600)
+
 
 # # Set up logging
 

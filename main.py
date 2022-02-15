@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
-# import wizzair
+import requests_cache
 from ryanair import RyanairHandler
 from transavia import TransaviaHandler
 from wizzair import WizzairHandler
@@ -38,7 +37,7 @@ try:
 except:
     print ('Public ip not found')
 
-
+requests_cache.install_cache('flights_cache', backend='sqlite', expire_after=600)
 
 app.add_middleware(
     CORSMiddleware,
