@@ -294,6 +294,7 @@ class WizzairHandler:
 
     
     @staticmethod
+    @cached(ttl=600)
     async def get_cheapest_return(origin, date_outbound, date_inbound, airports, limit=1000):
         start = time.time()
         flights=[]
