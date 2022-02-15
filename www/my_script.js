@@ -1,4 +1,5 @@
-var map = L.map('map').setView([52.01, 4.438], 9);
+// var map = L.map('map').setView([52.01, 4.438], 9);
+
 var greenIcon = new L.Icon({
     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
@@ -31,10 +32,34 @@ var greenIcon = new L.Icon({
     }
 
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-}).addTo(map);
 
+
+
+// from here
+function myOwmMarker(data) {
+    // just a Leaflet default marker
+    return L.marker([data.coord.Lat, data.coord.Lon]);
+}
+
+function myOwmPopup(data) {
+    // just a Leaflet default popup with name as content
+    return L.popup().setContent(data.name);
+}
+
+var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'});
+  
+var temp = L.OWM.temperature({opacity: 0.3, palette: '3:FF0000;5:00FF00;9:0000FF', appId: '4aa410d2d7b9d37b47518bf48df5ce3f'});
+var rain = L.OWM.rain({appId: '4aa410d2d7b9d37b47518bf48df5ce3f'});
+var map = L.map('map', { center: new L.LatLng(52.01, 4.4), zoom: 9, layers: [osm] });
+var baseMaps = { "Current weather": osm };
+var overlayMaps = { "Temp": temp,"Rain": rain };
+var layerControl = L.control.layers(baseMaps, overlayMaps).addTo(map);
+var imageUrl = 'owmloading.gif';
+
+
+
+
+// up to here
 var outbound_date_from= new Date().addDays(1).toLocaleString('en-GB').slice(0,10).replaceAll('/','-');
 var outbound_date_to= new Date().addDays(1).toLocaleString('en-GB').slice(0,10).replaceAll('/','-');
 var inbound_date_from= new Date().addDays(8).toLocaleString('en-GB').slice(0,10).replaceAll('/','-');
@@ -63,6 +88,12 @@ function onMapClick(e) {
     // console.log(e.target.options.name);
     $("body").css("cursor", "progress");
     $('.leaflet-container').css('cursor','progress');
+    var coords = (e.target._latlng)
+    bounds=[[coords.lat-0.1, coords.lng-0.2],[coords.lat+0.1, coords.lng+0.2]];
+
+    progs=L.imageOverlay(imageUrl, bounds).addTo(map).bringToFront();
+
+
 
     fetch('https://flexifly.nl/get_all_flights_from/'+e.target.options.name+"?" + new URLSearchParams({
         outbound_date_from: outbound_date_from,
@@ -124,6 +155,7 @@ function onMapClick(e) {
         }
         $("body").css("cursor", "default");
         $('.leaflet-container').css('cursor','default');
+        map.removeLayer(progs);
     })
 
 }
