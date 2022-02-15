@@ -11,6 +11,7 @@ import pickle
 import os.path
 
 
+
 # Set up logging
 
 logger=logging.getLogger(__name__)
@@ -26,9 +27,11 @@ logger.setLevel(logging.INFO)
 
 AIRPORTS_URL = 'https://be.wizzair.com/12.0.0/Api/asset/map'
 #TIMETABLE_URL = 'https://be.wizzair.com/11.17.2/Api/search/timetable'
-TIMETABLE_URL = 'https://be.wizzair.com/12.0.0/Api/search/timetable'
+TIMETABLE_URL = 'https://be.wizzair.com/12.1.1/Api/search/timetable'
+#TIMETABLE_URL = 'https://be.wizzair.com/12.0.0/Api/search/timetable'
 #TIMETABLE_URL = 'https://be.wizzair.com/11.17.0/Api/assets/timechart'
 timeout = 15
+
 
 headers={
 "accept": "application/json, text/plain, */*",
@@ -71,6 +74,7 @@ class WizzairHandler:
         }
 
         try:
+            print ('params=',params)
             response = requests.get(AIRPORTS_URL, params=payload, headers=headers)
             airports = response.json()
 
