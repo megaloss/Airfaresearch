@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import requests_cache
 from ryanair import RyanairHandler
 from transavia import TransaviaHandler
 from wizzair import WizzairHandler
@@ -8,6 +7,7 @@ from datetime import datetime, timedelta, date
 import pickle
 from classes import Airport, Route, SingleFare, ReturnFare
 from utils import encode_datetime
+#import requests_cache
 airports = {}
 
 import pickle
@@ -38,7 +38,7 @@ except:
     print ('Public ip not found')
 
 
-requests_cache.install_cache('flights_cache', backend='sqlite', expire_after=600, allowable_methods=('GET', 'POST'))
+#requests_cache.install_cache('flights_cache', backend='sqlite', expire_after=600, allowable_methods=('GET', 'POST'))
 
 
 app.add_middleware(
