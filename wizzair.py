@@ -12,6 +12,7 @@ import os.path
 
 from aiocache import cached
 
+timeout=aiohttp.ClientTimeout(60)
 
 # Set up logging
 
@@ -31,7 +32,7 @@ AIRPORTS_URL = 'https://be.wizzair.com/12.0.0/Api/asset/map'
 TIMETABLE_URL = 'https://be.wizzair.com/12.1.1/Api/search/timetable'
 #TIMETABLE_URL = 'https://be.wizzair.com/12.0.0/Api/search/timetable'
 #TIMETABLE_URL = 'https://be.wizzair.com/11.17.0/Api/assets/timechart'
-timeout = 15
+#timeout = 15
 
 
 headers={
@@ -242,7 +243,7 @@ class WizzairHandler:
                             }
 
                 #print (json.dumps(payload).replace(' ',''))
-                tasks.append(asyncio.create_task(session.post(TIMETABLE_URL, data=json.dumps(payload).replace(' ',''), headers=headers)))
+                tasks.append(asyncio.create_task(session.post(TIMETABLE_URL, data=json.dumps(payload).replace(' ',''), headers=headers,skip_auto_headers=['Host'], timeout=timeout)))
                 
 
             responses = await asyncio.gather(*tasks)
@@ -302,8 +303,8 @@ class WizzairHandler:
             logger.debug('No destinations available')
             logger.info (f'Finished in {str(round(time.time()-start,2))} sec.')
             return []
-        logger.debug ('Destinations found :')
-        logger.debug (destinations)
+        #logger.debug ('Destinations found :')
+        #logger.debug (destinations)
 
         dest_airports=[]
         #tasks=[]
@@ -314,7 +315,7 @@ class WizzairHandler:
             dest_airports.append(destination_airport)
 
         flights = await WizzairHandler.get_returns(origin, dest_airports, date_outbound, date_inbound, airports)
-        logger.debug (flights)
+        #logger.debug (flights)
 
         if not flights:
             logger.debug('returning empty array...')

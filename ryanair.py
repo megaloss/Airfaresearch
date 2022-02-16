@@ -8,7 +8,7 @@ import json
 import time
 from aiocache import cached
 
-
+timeout=aiohttp.ClientTimeout(60)
 
 
 ROUND_TRIP_API_URL = 'https://www.ryanair.com/api/farfnd/v4/roundTripFares'
@@ -19,7 +19,7 @@ SINGLE_TRIP_API_URL ='https://www.ryanair.com/api/farfnd/v4/oneWayFares'
 # # Set up logging
 
 logger=logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 # file_handler = logging.FileHandler('ryanair.log')
 # log_formatter = logging.Formatter('%(asctime)s:%(levelname)s:%(module)s:%(funcName)s:%(message)s')
 
@@ -86,7 +86,6 @@ class RyanairHandler:
 
 
     @staticmethod
-    @cached(ttl=3600)
     async def get_destinations(origin, date,price_limit=1000):
         # SINGLE_TRIP_API_URL = 'https://services-api.ryanair.com/farfnd/3/oneWayFares'
         # SINGLE_TRIP_API_URL ='https://www.ryanair.com/api/farfnd/v4/oneWayFares'
@@ -222,7 +221,7 @@ class RyanairHandler:
                 #    'priceValueTo': price_max
                    }
 
-                tasks.append(asyncio.create_task(session.get(ROUND_TRIP_API_URL, params=payload)))
+                tasks.append(asyncio.create_task(session.get(ROUND_TRIP_API_URL, params=payload, timeout=timeout)))
                 
 
             responses = await asyncio.gather(*tasks)
@@ -231,7 +230,6 @@ class RyanairHandler:
             if response.status !=200:
                 logger.error(f"server returned {response}")
                 return []
-            #logger.debug (await response.text())
             data = await response.json()
 
             if len(data) < 1 or not data['fares']:
@@ -268,6 +266,7 @@ class RyanairHandler:
 
 
         flights=[]
+        logger.debug ('Ryanair look for dests')
         destinations = await RyanairHandler.get_destinations(origin, date_outbound)
         if not destinations:
             logger.debug('No destinations available')

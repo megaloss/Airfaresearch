@@ -97,4 +97,5 @@ async def get_all_flights_from(airport_id, outbound_date_from=date_from[0],outbo
     if not flights:
         logging.info ("No flights found !")
         return []
+    print ('Done !')
     return flights
