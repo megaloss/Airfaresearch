@@ -86,7 +86,8 @@ class RyanairHandler:
 
 
     @staticmethod
-    def get_destinations(origin, date,price_limit=1000):
+    @cached(ttl=3600)
+    async def get_destinations(origin, date,price_limit=1000):
         # SINGLE_TRIP_API_URL = 'https://services-api.ryanair.com/farfnd/3/oneWayFares'
         # SINGLE_TRIP_API_URL ='https://www.ryanair.com/api/farfnd/v4/oneWayFares'
         if isinstance(date, tuple):
@@ -185,6 +186,7 @@ class RyanairHandler:
 
 
     @staticmethod
+    @cached(ttl=600)
     async def get_returns(origin, destinations, date_outbound, date_inbound, airports):
 
         if isinstance(date_outbound, tuple):
@@ -229,7 +231,7 @@ class RyanairHandler:
             if response.status !=200:
                 logger.error(f"server returned {response}")
                 return []
-            logger.debug (await response.text())
+            #logger.debug (await response.text())
             data = await response.json()
 
             if len(data) < 1 or not data['fares']:
@@ -266,7 +268,7 @@ class RyanairHandler:
 
 
         flights=[]
-        destinations = RyanairHandler.get_destinations(origin, date_outbound)
+        destinations = await RyanairHandler.get_destinations(origin, date_outbound)
         if not destinations:
             logger.debug('No destinations available')
             logger.info (f'Finished in {str(round(time.time()-start,2))} sec.')
