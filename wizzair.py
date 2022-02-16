@@ -41,7 +41,7 @@ headers={
 "accept-encoding": "gzip, deflate, br",
 "accept-language": "en-GB,en;q=0.9,ru-RU;q=0.8,ru;q=0.7,en-US;q=0.6,nl;q=0.5",
 "cache-control": "no-cache",
-"content-length": "260",
+#"content-length": "260",
 "content-type": "application/json;charset=UTF-8",
 "dnt": "1",
 "origin": "https://wizzair.com",
@@ -238,14 +238,14 @@ class WizzairHandler:
                 inbound = {"departureStation":airport.id,"arrivalStation":origin.id,"from":inboundDepartureDateFrom,"to":inboundDepartureDateTo}
                 flights=[outbound,inbound]
                 payload = {"flightList":flights,
-                            "priceType":"regular", 
-                            "adultCount":1,
-                            "childCount":0,
-                            "infantCount":0,
+                            "priceType":"regular",
+                            "adultCount":"1",
+                            "childCount":"0",
+                            "infantCount":"0"
                             }
                 payload = json.dumps(payload).replace(' ','')
                 logger.debug ('sent request for ' + airport.id)
-                tasks.append(asyncio.create_task(session.post(TIMETABLE_URL, data=payload, headers=headers)))
+                tasks.append(asyncio.create_task(session.post(TIMETABLE_URL, data=payload, headers=headers,verify_ssl=False)))
 
                 await asyncio.sleep(0)
             responses = await asyncio.gather(*tasks)
@@ -290,7 +290,8 @@ class WizzairHandler:
                 outbound = SingleFare(route, best_outbound[0], best_outbound[0], best_outbound[1], flight_number)
                 inbound = SingleFare(route.invert(), best_inbound[0], best_inbound[0], best_inbound[1], flight_number)
                 fares.append(ReturnFare(outbound,inbound)) # list is expected !
-            continue
+            else:
+                continue
         return fares
 
 
