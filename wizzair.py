@@ -231,7 +231,8 @@ class WizzairHandler:
         offset = 0
         fares = []
         tasks=[]
-        async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(family=socket.AF_INET)) as session:
+        connector = aiohttp.TCPConnector(family=socket.AF_INET)
+        async with aiohttp.ClientSession(connector=connector) as session:
             for airport in destinations:
                 outbound= {"departureStation":origin.id,"arrivalStation":airport.id,"from":outboundDepartureDateFrom,"to":outboundDepartureDateTo}
                 inbound = {"departureStation":airport.id,"arrivalStation":origin.id,"from":inboundDepartureDateFrom,"to":inboundDepartureDateTo}
@@ -242,12 +243,11 @@ class WizzairHandler:
                             "childCount":0,
                             "infantCount":0,
                             }
-
-                #print (json.dumps(payload).replace(' ',''))
+                payload = json.dumps(payload).replace(' ','')
                 logger.debug ('sent request for ' + airport.id)
-                tasks.append(asyncio.create_task(session.post(TIMETABLE_URL, data=json.dumps(payload).replace(' ',''), headers=headers,skip_auto_headers=['Host'], timeout=timeout)))
-                
+                tasks.append(asyncio.create_task(session.post(TIMETABLE_URL, data=payload, headers=headers)))
 
+                await asyncio.sleep(0)
             responses = await asyncio.gather(*tasks)
         for response in responses:
             #logger.debug (response.status)
