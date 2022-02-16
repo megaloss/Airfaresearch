@@ -9,6 +9,7 @@ import logging
 import time
 import pickle
 import os.path
+import socket
 
 from aiocache import cached
 
@@ -17,9 +18,9 @@ timeout=aiohttp.ClientTimeout(60)
 # Set up logging
 
 logger=logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 # file_handler = logging.FileHandler('wizzair.log')
-# log_formatter = logging.Formatter('%(asctime)s:%(levelname)s:%(module)s:%(funcName)s:%(message)s')
+#log_formatter = logging.Formatter('%(asctime)s:%(levelname)s:%(module)s:%(funcName)s:%(message)s')
 
 # file_handler.setFormatter(log_formatter)
 # logger.addHandler(file_handler)
@@ -230,7 +231,7 @@ class WizzairHandler:
         offset = 0
         fares = []
         tasks=[]
-        async with aiohttp.ClientSession() as session:
+        async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(family=socket.AF_INET)) as session:
             for airport in destinations:
                 outbound= {"departureStation":origin.id,"arrivalStation":airport.id,"from":outboundDepartureDateFrom,"to":outboundDepartureDateTo}
                 inbound = {"departureStation":airport.id,"arrivalStation":origin.id,"from":inboundDepartureDateFrom,"to":inboundDepartureDateTo}
@@ -243,16 +244,17 @@ class WizzairHandler:
                             }
 
                 #print (json.dumps(payload).replace(' ',''))
+                logger.debug ('sent request for ' + airport.id)
                 tasks.append(asyncio.create_task(session.post(TIMETABLE_URL, data=json.dumps(payload).replace(' ',''), headers=headers,skip_auto_headers=['Host'], timeout=timeout)))
                 
 
             responses = await asyncio.gather(*tasks)
         for response in responses:
-            logger.debug (response.status)
+            #logger.debug (response.status)
             if response.status !=200:
                 logger.error(f"server returned {response}")
                 return []
-            logger.debug (await response.text())
+            #logger.debug (await response.text())
             data = await response.json()
             if len (data['outboundFlights'])<1 or len (data["returnFlights"])<1:
                 continue
@@ -265,7 +267,7 @@ class WizzairHandler:
             destination = airports.get(data['outboundFlights'][0]['arrivalStation'])
             if not origin or not destination:
                 continue
-            # print (f'A flight from {origin} to {destination}')
+            logger.debug (f'A flight from {origin.id} to {destination.id}')
 
 
             for item in data['outboundFlights']:
