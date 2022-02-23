@@ -1,5 +1,6 @@
-// var map = L.map('map').setView([52.01, 4.438], 9);
-
+var main_URL='https://flexifly.nl'
+var main_URL='https://yurick.duckdns.org:8000'
+var main_URL='http://127.0.0.1:8000'
 var greenIcon = new L.Icon({
     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
@@ -18,6 +19,14 @@ var greenIcon = new L.Icon({
   });
   var yellowIcon = new L.Icon({
     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-gold.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+  });
+  var redIcon = new L.Icon({
+    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
     iconSize: [25, 41],
     iconAnchor: [12, 41],
@@ -95,7 +104,7 @@ function onMapClick(e) {
 
 
 
-    fetch('https://flexifly.nl/get_all_flights_from/'+e.target.options.name+"?" + new URLSearchParams({
+    fetch(main_URL+'/get_all_flights_from/'+e.target.options.name+"?" + new URLSearchParams({
         outbound_date_from: outbound_date_from,
         outbound_date_to: outbound_date_to,
         inbound_date_from: inbound_date_from,
@@ -123,7 +132,10 @@ function onMapClick(e) {
                     company = 'Wizzair';
                     my_icon = violetIcon;
                 }
-                
+                else if(flight_no.startsWith('EA')){
+                    company = 'Easyjet';
+                    my_icon = redIcon;
+                }
                 else{
                     company = 'Transavia';
                     my_icon = greenIcon;
@@ -164,7 +176,7 @@ function onMapClick(e) {
 
 
 
-fetch('https://flexifly.nl/get_origin_airports/')
+fetch(main_URL+'/get_origin_airports/')
   .then(response => response.json())
   .then(function(data){
     const codes=Object.keys(data);

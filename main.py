@@ -3,10 +3,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from ryanair import RyanairHandler
 from transavia import TransaviaHandler
 from wizzair import WizzairHandler
+from easyjet import EasyjetHandler
 from datetime import datetime, timedelta, date
-import pickle
 from classes import Airport, Route, SingleFare, ReturnFare
 from utils import encode_datetime
+from os import path
+
 
 
 airports = {}
@@ -47,8 +49,25 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+airports_dict='airports.p'
+
+my_handlers = [TransaviaHandler,RyanairHandler,WizzairHandler, EasyjetHandler]
+
+if not path.exists(airports_dict):
+    airports={}
+    for handler in my_handlers:
+        data=handler.read_airports()
+        #print (data)
+        airports.update (data)
+    print ('just loaded ', len(airports), 'airports')
+    with open (airports_dict,'wb') as f:
+        pickle.dump(airports,f)
+
+#my_handlers = [TransaviaHandler,RyanairHandler,WizzairHandler]
+
 airports= pickle.load(open('airports.p', 'rb'))
-my_handlers = [TransaviaHandler,RyanairHandler,WizzairHandler]
+
+
 origin = [airports['RTM'], airports['EIN'], airports['AMS'], airports['CRL'], airports['BRU']]
 date_from = (datetime(2022, 2, 25),datetime(2022, 2, 28))
 date_to = (datetime(2022, 3, 6),datetime(2022, 3, 8))

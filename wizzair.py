@@ -28,7 +28,7 @@ logger.setLevel(logging.DEBUG)
 
 #logging.basicConfig(level=logging.DEBUG, format='%(asctime)s:%(levelname)s:%(module)s:%(funcName)s:%(message)s')
 
-AIRPORTS_URL = 'https://be.wizzair.com/12.0.0/Api/asset/map'
+AIRPORTS_URL = 'https://be.wizzair.com/12.1.1/Api/asset/map'
 #TIMETABLE_URL = 'https://be.wizzair.com/11.17.2/Api/search/timetable'
 TIMETABLE_URL = 'https://be.wizzair.com/12.1.1/Api/search/timetable'
 #TIMETABLE_URL = 'https://be.wizzair.com/12.0.0/Api/search/timetable'
@@ -71,13 +71,13 @@ class WizzairHandler:
         # headers = {
         #     'user-agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Mobile Safari/537.36'
         # }
-        payload = {
-            'languageCode': 'en - gb'
-        }
+        # payload = {
+        #     'languageCode': 'en - gb'
+        # }
 
         try:
             #print ('params=',params)
-            response = requests.get(AIRPORTS_URL, params=payload, headers=headers)
+            response = requests.get(AIRPORTS_URL, headers=headers)
             airports = response.json()
 
         except Exception as e:
