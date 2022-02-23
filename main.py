@@ -29,7 +29,8 @@ origins = [
     "http://flexifly.nl",
     "http://www.flexifly.nl",
     "https://www.flexifly.nl",
-    "http://flexifly.nl"
+    "http://flexifly.nl",
+    "https://flexifly.nl"
 
 ]
 
