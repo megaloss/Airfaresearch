@@ -26,24 +26,24 @@ URL='https://www.easyjet.com/ejcms/cache15m/api/flights/search'
 # #?AdminFeePerBooking=0&AllDestinations=false&AllOrigins=false&AssumedPassengersPerBooking=2&AssumedSectorsPerBooking=1&CreditCardFeePercent=0&CurrencyId=4&DestinationIatas=BUD&EndDate=2022-07-27&MaxResults=1&OriginIatas=AMS&StartDate=2022-06-2'
 # #URL1='https://www.easyjet.com/api/routepricing/v2/searchfares/GetLowestOutboundPrice?departureAirport=BSL&arrivalAirport=AGA&currency=GBP'
 # URL1='https://www.easyjet.com/api/routepricing/v2/searchfares/GetLowestDailyFares?departureAirport=BSL&arrivalAirport=AGA&currency=GBP'
-payload={
+# payload={
 
-"AdminFeePerBooking": "0",
-"AllDestinations": "false",
-"AllOrigins": "false",
-"AssumedPassengersPerBooking": "1",
-"AssumedSectorsPerBooking": "1",
-"CreditCardFeePercent": "0",
-"CurrencyId": "4",
-"DestinationIatas": "CFU,EFL,RHO,SKG,HER,MXP,KRK,FAO,LIS,OPO",
-"StartDate": "2022-06-22",
-"EndDate": "2022-07-27",
-"MaxResults": "1",
-"OriginIatas": "AMS",
+# "AdminFeePerBooking": "0",
+# "AllDestinations": "false",
+# "AllOrigins": "false",
+# "AssumedPassengersPerBooking": "1",
+# "AssumedSectorsPerBooking": "1",
+# "CreditCardFeePercent": "0",
+# "CurrencyId": "4",
+# "DestinationIatas": "CFU,EFL,RHO,SKG,HER,MXP,KRK,FAO,LIS,OPO",
+# "StartDate": "2022-06-22",
+# "EndDate": "2022-07-27",
+# "MaxResults": "1",
+# "OriginIatas": "AMS",
 
-"MaxPrice": "40",
-"PreferredOriginIatas": "AMS",
-}
+# "MaxPrice": "40",
+# "PreferredOriginIatas": "AMS",
+# }
 
 
 
@@ -157,7 +157,7 @@ class EasyjetHandler:
         "StartDate": outboundDepartureDateFrom,
         "EndDate": outboundDepartureDateTo,
         "MaxResults": "50",
-        "OriginIatas": "AMS",
+        "OriginIatas": origin.id,
         }
 
         payload_return={
@@ -173,7 +173,7 @@ class EasyjetHandler:
         "StartDate": inboundDepartureDateFrom,
         "EndDate": inboundDepartureDateTo,
         "MaxResults": "50",
-        "DestinationIatas": "AMS",
+        "DestinationIatas": origin.id,
         #"MaxPrice": "40",
         #"PreferredOriginIatas": "AMS",
         }
