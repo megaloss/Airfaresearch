@@ -52,8 +52,8 @@ app.add_middleware(
 
 airports_dict='airports.p'
 
-my_handlers = [TransaviaHandler,RyanairHandler,WizzairHandler, EasyjetHandler]
-
+my_handlers = [TransaviaHandler,RyanairHandler,EasyjetHandler]
+#WizzairHandler, - removed
 if not path.exists(airports_dict):
     airports={}
     for handler in my_handlers:

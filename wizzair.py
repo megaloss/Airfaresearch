@@ -28,10 +28,10 @@ logger.setLevel(logging.DEBUG)
 
 #logging.basicConfig(level=logging.DEBUG, format='%(asctime)s:%(levelname)s:%(module)s:%(funcName)s:%(message)s')
 
-AIRPORTS_URL = 'https://be.wizzair.com/12.1.1/Api/asset/map'
+AIRPORTS_URL = 'https://be.wizzair.com/12.2.0/Api/asset/map'
 #TIMETABLE_URL = 'https://be.wizzair.com/11.17.2/Api/search/timetable'
-TIMETABLE_URL = 'https://be.wizzair.com/12.1.1/Api/search/timetable'
-#TIMETABLE_URL = 'https://be.wizzair.com/12.0.0/Api/search/timetable'
+TIMETABLE_URL = 'https://be.wizzair.com/12.2.0/Api/search/timetable'
+#TIMETABLE_URL = 'https://be.wizzair.com/12.1.2/Api/search/timetable'
 #TIMETABLE_URL = 'https://be.wizzair.com/11.17.0/Api/assets/timechart'
 #timeout = 15
 
